@@ -1,0 +1,7 @@
+streamlit
+python-dotenv
+langchain-google-genai
+langchain
+beautifulsoup4
+requests
+gtts 
