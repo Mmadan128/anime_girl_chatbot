@@ -37,16 +37,16 @@ DEFAULT_AVATAR_EMOTION = 'idle'
 # Define avatar image map for emotions
 # Ensure these files exist in your 'avatars/' directory!
 AVATAR_IMAGE_MAP = {
-    'idle': 'luna_idle.png',
-    'speaking': 'luna_speaking.png',
-    'happy': 'luna_happy.png',
+    'idle': 'luna_idle.jpg',
+    'speaking': 'luna_speaking.jpg',
+    'happy': 'luna_happy.jpg',
     'excited': 'luna_excited.png',
-    'mischievous': 'luna_mischievous.png',
-    'curious': 'luna_curious.png',
-    'sad': 'luna_sad.png',
-    'confused': 'luna_confused.png',
-    'thinking': 'luna_thinking.png',
-    'energetic': 'luna_excited.png'
+    'mischievous': 'luna_mischievous.jpg',
+    'curious': 'luna_curious.jpg',
+    'sad': 'luna_sad.jpg',
+    'confused': 'luna_confused.jpg',
+    'thinking': 'luna_thinking.jpg',
+    'energetic': 'luna_excited.jpg'
 }
 
 # --- Helper Function for Emotion Inference ---
