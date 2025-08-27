@@ -38,7 +38,8 @@ DEFAULT_AVATAR_EMOTION = 'idle'
 
 # --- ElevenLabs Configuration ---
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-LUNA_VOICE_ID = "piTKgcLEGmPE4e6mEKli"  # This is the ID for the voice "Rachel"
+# --- FIXED: Using the correct, official Voice ID for "Rachel" ---
+LUNA_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # This is the ID for the voice "Rachel"
 
 # --- Initialize ElevenLabs Client ---
 elevenlabs_client = None
@@ -96,7 +97,7 @@ def get_avatar_image_path(emotion: str) -> str:
 def generate_luna_audio(text: str) -> Optional[str]:
     """
     Generates an MP3 audio file using ElevenLabs.
-    THIS FUNCTION REMAINS UNCHANGED, AS PER YOUR REQUEST.
+    This function's API call method remains UNCHANGED.
     """
     if not text.strip() or not elevenlabs_client:
         print("❌ No text provided or ElevenLabs client not initialized")
@@ -129,12 +130,11 @@ def generate_luna_audio(text: str) -> Optional[str]:
             print(f"❌ Audio file was not created properly")
             return None
     except Exception as e:
-        # Error handling is unchanged
         error_message = str(e)
         print(f"❌ ERROR generating audio: {error_message}")
         if "quota_exceeded" in error_message.lower(): st.warning("🔊 Luna's voice quota is used up! 🤫")
         elif "invalid_api_key" in error_message.lower(): st.error("🔐 Luna's voice key isn't working!")
-        elif "voice" in error_message.lower() and "not found" in error_message.lower(): st.warning(f"🎭 Luna's voice ID might be wrong.")
+        elif "voice" in error_message.lower() and "not found" in error_message.lower(): st.warning(f"🎭 Luna's voice ID might be wrong. Current ID: {LUNA_VOICE_ID}")
         else: st.warning("🔊 Luna's voice box is having a tiny problem! 💖")
         return None
 
@@ -197,13 +197,12 @@ if 'current_avatar_emotion' not in st.session_state:
 
 # --- Sidebar ---
 with st.sidebar:
-    # --- FIXED: Replaced use_container_width with width ---
     st.image(get_avatar_image_path(st.session_state.current_avatar_emotion), 
              caption="Luna, your AI companion 💖", width='stretch')
     st.markdown("---")
     st.markdown("🎵 **Background Music**")
     play_background_music(BACKGROUND_MUSIC_FILE, volume=0.2)
-    st.info("Background music is on~ 🎶")
+    st.info("Music is on~ 🎶")
     st.markdown("---")
     st.markdown("🌸 **Luna's Abilities:**")
     st.markdown("- **Search-chan:** Web searches\n- **Calc-kun:** Math wizardry\n- **Muse-sensei:** Creative writing")
@@ -216,20 +215,15 @@ for msg in st.session_state.chat_history:
         if role == 'assistant' and msg.get("audio_url") and os.path.exists(msg["audio_url"]):
             st.audio(msg["audio_url"], format="audio/mp3", autoplay=True)
 
-# --- FIXED: Consolidated Input and Response Logic to prevent image cache errors ---
+# --- Main App Logic ---
 if user_input := st.chat_input("Type your message, Master..."):
-    # Add user message to history
     st.session_state.chat_history.append({"sender": "User", "text": user_input})
-
-    # Process Luna's response immediately
     with st.spinner("💖 Luna is thinking... Hehe! ✨"):
         luna_response_text = ""
         try:
-            # Try AIML first for quick responses
             aiml_response = st.session_state.aiml_engine.process(user_input)
             if aiml_response:
                 luna_response_text = aiml_response
-            # Fall back to the LangChain agent if no AIML match
             elif st.session_state.agent_executor:
                 response = st.session_state.agent_executor.invoke({"input": user_input})
                 luna_response_text = response['output']
@@ -238,23 +232,13 @@ if user_input := st.chat_input("Type your message, Master..."):
         except Exception as e:
             print(f"Error processing user input: {e}")
             luna_response_text = f"Eeeek! A tiny problem occurred! Let's try again! 💖"
-
-        # Determine emotion and generate audio
         luna_emotion = infer_emotion_from_text(luna_response_text)
         luna_audio_url = generate_luna_audio(luna_response_text)
-
-        # Add Luna's complete response to history
         st.session_state.chat_history.append({
-            "sender": "Luna", 
-            "text": luna_response_text,
-            "emotion": luna_emotion, 
-            "audio_url": luna_audio_url
+            "sender": "Luna", "text": luna_response_text,
+            "emotion": luna_emotion, "audio_url": luna_audio_url
         })
-        
-        # Update the avatar emotion for the UI refresh
         st.session_state.current_avatar_emotion = luna_emotion
-
-    # Use a single rerun at the end to update the UI reliably
     st.rerun()
 
 # --- Main Execution Guard ---
